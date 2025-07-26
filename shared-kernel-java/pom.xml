@@ -78,13 +78,6 @@
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
-        <annotationProcessorPaths>
-            <path>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.30</version>
-            </path>
-        </annotationProcessorPaths>
 
         <!-- ModelMapper -->
         <dependency>
