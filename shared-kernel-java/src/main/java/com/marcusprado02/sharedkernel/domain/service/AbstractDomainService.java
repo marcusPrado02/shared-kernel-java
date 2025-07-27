@@ -1,29 +1,30 @@
 package com.marcusprado02.sharedkernel.domain.service;
 
-
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.transaction.annotation.Transactional;
 import com.marcusprado02.sharedkernel.domain.aggregateroot.AggregateRoot;
 import com.marcusprado02.sharedkernel.domain.event.DomainEventPublisher;
-import com.marcusprado02.sharedkernel.domain.repository.BaseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Base genérica para Domain Services.
+ * Base genérica para Domain Services, agora usando Spring Data CrudRepository.
  *
- * <T> Agregado raiz <ID> Tipo da chave primária <R> Porta de repositório
+ * @param <T> Agregado raiz
+ * @param <ID> Tipo da chave primária
+ * @param <R> Repositório Spring Data (CrudRepository, JpaRepository, etc)
  */
 @Slf4j
-@Transactional // garante atomicidade (propagation = REQUIRED por padrão)
-public abstract class AbstractDomainService<T extends AggregateRoot<ID>, ID, R extends BaseRepository<T, ID>>
+@Transactional // propagation = REQUIRED por padrão
+public abstract class AbstractDomainService<T extends AggregateRoot<ID>, ID, R extends CrudRepository<T, ID>>
         implements DomainService {
 
     protected final R repository;
     protected final DomainEventPublisher publisher;
-    protected final Clock clock; // para testabilidade de datas/horas
+    protected final Clock clock;
 
     protected AbstractDomainService(R repository, DomainEventPublisher publisher, Clock clock) {
         this.repository = repository;
@@ -50,18 +51,19 @@ public abstract class AbstractDomainService<T extends AggregateRoot<ID>, ID, R e
     }
 
     protected void remove(ID id) {
-        if (!repository.existsById(id))
+        if (!repository.existsById(id)) {
             throw new EntityNotFoundException("Entidade inexistente: " + id);
+        }
         repository.deleteById(id);
         log.info("Entidade removida: {}", id);
     }
 
     /* ==== Hooks de extensão ============================================= */
 
-    /** Validações de domínio, auditoria, etc. */
-    protected void beforeSave(T aggregate) { /* default no-op */ }
+    /** Validations de domínio, auditoria, etc. */
+    protected void beforeSave(T aggregate) { /* no-op padrão */ }
 
-    /** Publica eventos, métricas, logs estruturados */
+    /** Publica eventos após o save e limpa lista de eventos do agregado */
     protected void afterSave(T aggregate) {
         aggregate.getDomainEvents().forEach(publisher::publish);
         aggregate.clearDomainEvents();

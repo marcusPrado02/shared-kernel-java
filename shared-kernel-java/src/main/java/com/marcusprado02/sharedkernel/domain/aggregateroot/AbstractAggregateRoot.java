@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
 import com.marcusprado02.sharedkernel.domain.entity.BaseEntity;
+import com.marcusprado02.sharedkernel.domain.event.DomainEvent;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Transient;
 import lombok.Getter;
@@ -25,16 +26,16 @@ public abstract class AbstractAggregateRoot<ID> extends BaseEntity implements Ag
 
     /** Eventos acumulados a serem publicados */
     @Transient
-    private final List<Object> domainEvents = new ArrayList<>();
+    private final List<DomainEvent> domainEvents = new ArrayList<>();
 
     /** Adiciona um evento de domínio */
-    protected void addDomainEvent(Object event) {
+    protected void addDomainEvent(DomainEvent event) {
         this.domainEvents.add(event);
     }
 
     /** Retorna todos os eventos pendentes */
     @DomainEvents
-    public Collection<Object> domainEvents() {
+    public Collection<DomainEvent> domainEvents() {
         return domainEvents;
     }
 
