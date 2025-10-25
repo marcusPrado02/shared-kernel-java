@@ -1,0 +1,70 @@
+# === Maven ===
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+dependency-reduced-pom.xml
+
+# === Gradle (caso tenha wrapper) ===
+.gradle/
+build/
+
+# === Protobuf/gRPC generated code ===
+# (cuidado: só os .java gerados, não os .proto!)
+sharedkernel/build/generated-sources/
+**/build/generated-sources/
+
+# === IDEs ===
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# VS Code
+.vscode/
+.classpath
+.project
+.settings/
+
+# Eclipse
+*.prefs
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === Logs e temp ===
+*.log
+*.tmp
+*.bak
+
+.proto-bin
+
+# === Outros ===
+kernel-aop/
+kernel-auth/
+kernel-bom/
+kernel-cache/
+kernel-context/
+kernel-converters/
+kernel-core/
+kernel-cqrs/
+kernel-formatters/
+kernel-graphql/
+kernel-grpc/
+kernel-integration/
+kernel-mt/
+kernel-observability/
+kernel-outbox/
+kernel-pagination/
+kernel-rest/
+kernel-saga/
+kernel-security/
+kernel-serialization/
+kernel-spi/
+kernel-starters/
+kernel-storage/
+kernel-telemetry/
+kernel-testkit/
+kernel-workflow/
