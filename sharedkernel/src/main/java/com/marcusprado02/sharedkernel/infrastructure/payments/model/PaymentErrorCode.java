@@ -1,0 +1,7 @@
+package com.marcusprado02.sharedkernel.infrastructure.payments.model;
+
+public enum PaymentErrorCode {
+    NONE, NETWORK, TIMEOUT, RATE_LIMIT, AUTHENTICATION, AUTHORIZATION,
+    INSUFFICIENT_FUNDS, INVALID_CARD, FRAUD_SUSPECTED, DUPLICATE, PROVIDER_UNAVAILABLE,
+    VALIDATION, UNKNOWN, CANCELED
+}

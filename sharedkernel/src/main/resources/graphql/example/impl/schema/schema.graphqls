@@ -1,0 +1,45 @@
+scalar UUID
+scalar DateTime
+
+interface Node { id: ID! }
+
+type User implements Node {
+  id: ID!
+  name: String!
+  email: String
+  active: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+# Relay pagination
+type PageInfo { hasNextPage: Boolean!, hasPreviousPage: Boolean!, startCursor: String, endCursor: String }
+type UserEdge { node: User!, cursor: String! }
+type UserConnection { edges: [UserEdge!]!, pageInfo: PageInfo!, totalCount: Long! }
+
+# Input genérico de busca (similar ao SearchQuery do REST)
+input Filter {
+  field: String!
+  op: String!   # eq, ne, lt, lte, gt, gte, in, like, contains...
+  values: [String!]!
+}
+
+input SortBy { field: String!, direction: String! } # ASC/DESC
+input PageRequest { first: Int, after: String, last: Int, before: String } # Relay style
+
+input UserCreate { name: String!, email: String }
+input UserUpdate { name: String, email: String, active: Boolean }
+
+type Query {
+  node(id: ID!): Node
+  users(filters: [Filter!], sort: [SortBy!], page: PageRequest): UserConnection!
+  user(id: ID!): User
+}
+
+type Mutation {
+  createUser(input: UserCreate!, idempotencyKey: String): User!
+  updateUser(id: ID!, input: UserUpdate!, ifMatch: String): User!
+  deleteUser(id: ID!): Boolean!
+}
+
+schema { query: Query, mutation: Mutation }

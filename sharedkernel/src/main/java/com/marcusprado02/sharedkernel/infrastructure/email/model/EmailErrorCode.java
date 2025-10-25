@@ -1,0 +1,6 @@
+package com.marcusprado02.sharedkernel.infrastructure.email.model;
+
+public enum EmailErrorCode {
+    NONE, NETWORK, TIMEOUT, RATE_LIMIT, AUTHENTICATION, AUTHORIZATION, VALIDATION,
+    CONTENT_REJECTED, SUPPRESSED, PROVIDER_UNAVAILABLE, MAILBOX_FULL, INVALID_ADDRESS, UNKNOWN
+}

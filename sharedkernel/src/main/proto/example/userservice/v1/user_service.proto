@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package userservice.v1;
+option java_multiple_files = true;
+option java_package = "com.example.users.v1";
+option java_outer_classname = "UserServiceProto";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/rpc/status.proto";
+import "google/rpc/error_details.proto";
+
+// Recurso base
+message User {
+  string id = 1;                // ULID/UUID
+  string name = 2;
+  string email = 3;
+  bool active = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  string version = 7;           // eTag/versão lógica (para controle otimista)
+}
+
+// Padrão cursor-based
+message Page {
+  int32 size = 1;               // page size solicitado
+  string cursor = 2;            // null/"" para primeira página
+}
+message PageResult {
+  string next_cursor = 1;
+  int64 total = 2;
+  bool has_more = 3;
+}
+
+// Filtros genéricos (Portable a outros serviços)
+message Filter {
+  string field = 1;             // name, email, active...
+  string op = 2;                // eq, ne, gt, gte, lt, lte, in, like, contains
+  repeated string values = 3;
+}
+message SortBy { string field = 1; string direction = 2; } // ASC/DESC
+
+// Requests/Responses
+message GetUserRequest { string id = 1; }
+
+message ListUsersRequest {
+  repeated Filter filters = 1;
+  repeated SortBy sort = 2;
+  Page page = 3;
+  // Sparse-Fieldsets opcional: "id,name,email"
+  string fields = 4;
+}
+
+message ListUsersResponse {
+  repeated User data = 1;
+  PageResult page = 2;
+}
+
+message CreateUserRequest { string name = 1; string email = 2; }
+message UpdateUserRequest { string id = 1; string name = 2; string email = 3; optional bool active = 4; }
+message DeleteUserRequest { string id = 1; }
+
+// Streaming de upsert em massa (bidi)
+message UpsertResult { string id = 1; string status = 2; string message = 3; }
+message BulkUpsertSummary { int32 success = 1; int32 failed = 2; }
+
+// Serviço
+service UserService {
+  rpc GetUser(GetUserRequest) returns (User);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);   // também poderia ser server-stream
+  rpc CreateUser(CreateUserRequest) returns (User);
+  rpc UpdateUser(UpdateUserRequest) returns (User);
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty);
+
+  // Bidi streaming: cliente envia Users parciais, servidor confirma em tempo real
+  rpc BulkUpsert(stream User) returns (stream UpsertResult);
+}
